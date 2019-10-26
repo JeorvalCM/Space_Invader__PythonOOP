@@ -1,109 +1,165 @@
 #!/usr/bin/env python
 # coding: utf-8
-
+#project made along with Andrés and Danilo
+#importing needed libraries
 import turtle
 import math
 import random
 
 # Set up screen
 wn = turtle.Screen()
+#color of the screen
 wn.bgcolor("white")
 wn.title("Tanks war")
 
+#registering a shape for using next
 turtle.register_shape("spaces.gif")
 
 # Draw border
+#create an object turtle
 border_pen = turtle.Turtle()
+#speed of drawing
 border_pen.speed(0)
+#color of the pen
 border_pen.color("black")
+#when is penup the pen only moves and does not leave a trail
 border_pen.penup()
+#set position of the pencil on the screen
 border_pen.setposition(-300, -300)
+#when is pendow the pen leave a trail
 border_pen.pendown()
+#size of the pend
 border_pen.pensize(3)
+#pen moving
 for side in range(4):
+    #goes 600 poxels forwards
     border_pen.fd(600)
+    #make a rotation of 90 degrees
     border_pen.lt(90)
+#hiding the turtle
 border_pen.hideturtle()
 
 
 # make classes
 class nave:
+    #class initializer
     def __init__(self, clr, angle, position, shape):
+        #nave's angle start
         self.angle = angle
+        #initializing an object turtle
         self.player = turtle.Turtle()
+        #color of the nave
         self.player.color(clr)
+        #shape of the nave
         self.player.shape(shape)
+        #having the pen up the moving of the nave will not leave a trail
         self.player.penup()
+        #speed of nave
         self.player.speed(0)
+        #start position
         self.player.setposition(position[0], position[1])
+        #angle of the head
         self.player.setheading(angle)
 
+#class tank that inherit class nave
 class tank(nave):
     def __init__(self, clr, angle, position, shape):
-        # create the player turtle
+        # create the player turtle using initializer of nave
         nave.__init__(self, clr, angle, position, shape)
+        #spped of the tank
         self.playerspeed = 15
+        #pixels that moves
         self.movement = 90
+        #bullet object of the nave
         self.shot = Bullet()
-
+    #method for moving forward
     def move_forward(self):
+        #get the y coordinate of nave
         y = self.player.ycor()
+        #condition to check if is going beyond of a border, and avoid it
         if y > -260:
             y = -260
+        #adding playerspeed to y , to advance in forward
         y += self.playerspeed
+        #setting the new y coordinate
         self.player.sety(y)
-
+    #method for moving right
     def move_right(self):
+        #get the x coordinate of nave
         x = self.player.xcor()
+        #condition to check if is going beyond of a border, and avoid it
         if x > 280:
             x = 280
         x += self.playerspeed
+         #setting the new x coordinate
         self.player.setx(x)
-
+    #method for moving left
     def move_left(self):
+        #get the x coordinate of nave
         x = self.player.xcor()
+        #condition to check if is going beyond of a border, and avoid it
         x -= self.playerspeed
         if x < -280:
             x = - 280
+        #setting the new x coordinate
         self.player.setx(x)
-
+    #method for moving backwards
     def move_back(self):
+        #get the y coordinate of nave
         y = self.player.ycor()
+        #condition to check if is going beyond of a border, and avoid it
         if y < -280:
             y = -280
         y -= self.playerspeed
+         #setting the new y coordinate
         self.player.sety(y)
-
+    #method for shooting
     def fire(self):
+        #check if the bullet is ready to be fired
         if self.shot.state == "ready":
+            #changin the state to fire in order to avoid shoot more than one bullet
             self.shot.state = "fire"
+            #getting coordinates of the nave
             x = self.player.xcor()
             y = self.player.ycor() + 10
+            #set position of the pullet
             self.shot.bullet.setposition(x,y)
+            #show the bullet
             self.shot.bullet.showturtle()
 
-
+#creating class bullet
 class Bullet:
-
+    #attibutes of the class
     speedbullet = 30
     state = "ready"
-
+    #initializer of the class
     def __init__(self):
         # create the player´s bullet
         self.bullet = turtle.Turtle()
+        #collor of the bullet
         self.bullet.color("black")
+        #shape of the bullet
         self.bullet.shape("triangle")
+        #avoiding trail of the bullet
         self.bullet.penup()
+        #speed of the bullet
         self.bullet.speed(0)
+        #angle of the bullet
         self.bullet.setheading(90)
+        #size of the bullet
         self.bullet.shapesize(0.5, 0.5)
+        #hiding bullet til its shot
         self.bullet.hideturtle()
-
+#function to check collition of bullet enemy
 def isCollision(t1, t2):
+    #getting distance by pythagoras' theorem
     distance = math.sqrt(math.pow(t1.xcor()-t2.xcor(),2)+ math.pow(t1.ycor()-t2.ycor(),2))
+    #checking the distance
     if distance < 15:
+        #the bullet collided with a nave
         return True
     else:
+        #the bullet did not collid with a nave
         return False
 
 number_of_enemies = 5
@@ -113,17 +169,20 @@ enemies = []
 
 #Add enemies to list
 for i in range(number_of_enemies):
+    #randoms for position of enemies
     x = random.randint(-200, 200)
     y = random.randint(100, 250)
     #create the enemy
     enemies.append(nave(clr="red",angle=0,position=[x,y], shape="circle"))
-
+#creating ships for both player
 jugador1 = tank(clr="red", angle=90,position=[0,-250], shape="spaces.gif")
 
 jugador2 = tank(clr="blue", angle=90,position=[0,-260], shape="spaces.gif" )
 
 
 # Create keyboard bindings
+#listen works to receive inputs trhough the keyboard
+#onkey works in this way, first parameter that is a function works when the key specified in the second paramter is pressed
 turtle.listen()
 turtle.onkey(jugador1.move_forward, "Up")
 turtle.onkey(jugador1.move_right, "Right")
@@ -137,8 +196,9 @@ turtle.onkey(jugador2.move_left, "a")
 turtle.onkey(jugador2.move_back, "s")
 turtle.onkey(jugador2.fire,"x")
 
+#speed of the enemy
 enemyspeed = 2
-
+#while True for the loop of the main game
 while True:
     perder = 0
     for enemy in enemies:
